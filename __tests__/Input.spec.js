@@ -24,30 +24,28 @@ const onReset = jest.fn();
 afterEach(cleanup);
 
 describe("Component => Input", () => {
+  const onInit = jest.fn();
   beforeEach(() => {
-    onInit.mockClear();
-    onChange.mockClear();
-    onSubmit.mockClear();
-    onReset.mockClear();
+    jest.clearAllMocks();
   });
 
-  it("should render a Input of type text", () => {
-    const type = "text";
+  const renderInput = (type, props = {}, value = "") => {
     const children = [
-      <Input key="1" data-testid="email" type={type} name="email" />
+      <Input key="1" data-testid={type} type={type} name={type} {...props} value={value} />
     ];
     const { getByTestId } = mountForm({ children });
+    return { getByTestId };
+  };
+
+  it("should render an Input of type text", () => {
+    const type = "text";
+    const { getByTestId } = renderInput(type);
     expect(getByTestId(/email/i).type).toBe(type);
   });
 
-  it("should render a Input of type checkbox", () => {
+  it("should render an Input of type checkbox", () => {
     const type = "checkbox";
-    const props = { onInit };
-
-    const children = [
-      <Input key="1" data-testid={type} type={type} name={type} checked />
-    ];
-    const { getByTestId } = mountForm({ children, props });
+    const { getByTestId } = renderInput(type, { onInit }, true);
     const checkbox = getByTestId(type);
     expect(onInit).toHaveBeenCalledWith({ [type]: true }, true);
     expect(checkbox.type).toBe(type);
@@ -55,22 +53,10 @@ describe("Component => Input", () => {
     expect(checkbox.value).toBe("");
   });
 
-  it("should render a Input of type checkbox with a value", () => {
+  it("should render an Input of type checkbox with a value", () => {
     const type = "checkbox";
-    const props = { onInit };
     const value = "123";
-
-    const children = [
-      <Input
-        key="1"
-        data-testid={type}
-        type={type}
-        value={value}
-        name={type}
-        checked
-      />
-    ];
-    const { getByTestId } = mountForm({ children, props });
+    const { getByTestId } = renderInput(type, { onInit }, value, true);
     const checkbox = getByTestId(type);
     expect(onInit).toHaveBeenCalledWith({ [type]: value }, true);
     expect(checkbox.type).toBe(type);
@@ -78,21 +64,9 @@ describe("Component => Input", () => {
     expect(checkbox.value).toBe(value);
   });
 
-  it("should render a Input of type radio", () => {
+  it("should render an Input of type radio", () => {
     const type = "radio";
-    const props = { onInit };
-
-    const children = [
-      <Input
-        key="1"
-        data-testid={type}
-        type={type}
-        name={type}
-        checked
-        value="3"
-      />
-    ];
-    const { getByTestId } = mountForm({ children, props });
+    const { getByTestId } = renderInput(type, { onInit }, "3", true);
     const radio = getByTestId(type);
     expect(onInit).toHaveBeenCalledWith({ [type]: "3" }, true);
     expect(radio.type).toBe(type);
